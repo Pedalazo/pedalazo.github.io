@@ -1,0 +1,132 @@
+<!doctype html>
+<!-- La página del reto: el juego comparte enlaces como
+     https://pedalazo.github.io/reto/#v=1&p=frailejon&s=123456&l=4&t=1061&n=Ricardo&c=hn
+     (pista, semilla, nivel, tiempo en décimas, nombre y país). Los datos van después del #, así que no
+     llegan al servidor: esta página los lee en el teléfono y ofrece abrir el juego o descargarlo. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pedalazo · ¡Te retaron!</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pedalazo">
+<meta property="og:title" content="¡Te retaron a una carrera de Pedalazo!">
+<meta property="og:description" content="Corre la misma carrera y gánale el tiempo. Carreras de bici con tres botones.">
+<meta property="og:image" content="https://pedalazo.github.io/icono.png">
+<style>
+  :root { --ink: #17214d; --muted: #57608c; --card: #fff8e1; --card2: #f6e9b8; --yellow: #f6c21a; --red: #e03a2b; }
+  body { margin: 0; background: var(--card); color: var(--ink); font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 520px; margin: 0 auto; padding: 32px 18px 48px; text-align: center; }
+  .icon { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 5px 0 var(--ink); }
+  .brand { font-weight: 900; letter-spacing: 2px; margin: 18px 0 0; color: var(--muted); font-size: 15px; }
+  h1 { font-size: 36px; line-height: 1.15; margin: 4px 0 6px; }
+  .who { font-size: 24px; font-weight: 800; color: var(--red); margin: 0 0 6px; }
+  .box { background: var(--card2); border: 2px solid var(--ink); border-radius: 16px; padding: 12px 16px; margin: 18px 0; box-shadow: 0 4px 0 var(--ink); }
+  .box span { display: block; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  .box b { display: block; font-size: 40px; line-height: 1.1; }
+  .box small { display: block; color: var(--muted); font-size: 15px; }
+  p { margin: 8px 0; }
+  .btn { display: block; margin: 12px auto 0; max-width: 340px; padding: 14px 18px; border: 2px solid var(--ink); border-radius: 16px; box-shadow: 0 4px 0 var(--ink);
+         font-weight: 900; font-size: 20px; text-decoration: none; color: var(--ink); background: var(--card2); letter-spacing: 0.5px; }
+  .btn.primary { background: var(--red); color: var(--card); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  .small { font-size: 14px; color: var(--muted); }
+  .get { margin-top: 30px; padding-top: 18px; border-top: 2px solid var(--card2); }
+  .foot { margin-top: 30px; font-size: 14px; color: var(--muted); }
+  a { color: var(--red); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="../icono.png" alt="Pedalazo">
+  <p class="brand">PEDALAZO</p>
+  <h1 id="title">¡Te retaron!</h1>
+  <p class="who" id="who" hidden></p>
+  <p id="desc">Carreras de bici con tres botones: ataca en las subidas, salta charcos y gana al sprint.</p>
+  <div class="box" id="box" hidden>
+    <span id="timeLabel">Tiempo a batir</span>
+    <b id="time"></b>
+    <small id="track"></small>
+  </div>
+  <a class="btn primary" id="open" href="#" hidden>Aceptar el reto</a>
+  <p class="small" id="have" hidden>Se abre en Pedalazo si ya lo tienes en este teléfono.</p>
+  <div class="get">
+    <p id="get">¿No tienes Pedalazo? Es gratis:</p>
+    <a class="btn" id="play" href="https://play.google.com/store/apps/details?id=com.arg.pedalazo">Google Play</a>
+    <p class="small" id="ios">En iPhone, muy pronto en el App Store.</p>
+  </div>
+  <p class="foot"><a href="../">pedalazo.github.io</a> · <a href="../privacidad/" id="privacy">Privacidad</a></p>
+</main>
+<script>
+(function () {
+  var es = (navigator.language || "es").toLowerCase().indexOf("es") === 0;
+  var T = es ? {
+    title: "¡Te retaron!", titleNone: "Pedalazo", challenges: " te reta", someone: "Alguien te reta",
+    desc: "A la misma carrera que corrió: los mismos rivales y los mismos charcos y huecos. Tú corres con tu bici. ¿Le ganas el tiempo?",
+    label: "Tiempo a batir", open: "Aceptar el reto", have: "Se abre en Pedalazo si ya lo tienes en este teléfono.",
+    get: "¿No tienes Pedalazo? Es gratis:", ios: "En iPhone, muy pronto en el App Store.", privacy: "Privacidad", lang: "es"
+  } : {
+    title: "You've been challenged!", titleNone: "Pedalazo", challenges: " challenges you", someone: "Someone challenges you",
+    desc: "To the same race they rode: same rivals, same puddles and potholes. You ride your own bike. Can you beat their time?",
+    label: "Time to beat", open: "Take the challenge", have: "It opens in Pedalazo if you already have it on this phone.",
+    get: "Don't have Pedalazo? It's free:", ios: "On iPhone, coming soon to the App Store.", privacy: "Privacy", lang: "en"
+  };
+  var TRACKS = {
+    valle: ["Valle Tranquilo", "Quiet Valley"], frailejon: ["Alto del Frailejón", "Frailejón Pass"], subeybaja: ["Sube y Baja", "Up and Down"],
+    recta: ["La Recta", "The Straight"], condor: ["Cima del Cóndor", "Condor Summit"], diablo: ["Bajada del Diablo", "Devil's Descent"]
+  };
+  var PACKAGE = "com.arg.pedalazo", PLAY = "https://play.google.com/store/apps/details?id=" + PACKAGE;
+  function $(id) { return document.getElementById(id); }
+
+  document.documentElement.lang = T.lang;
+  $("get").textContent = T.get;
+  $("ios").textContent = T.ios;
+  $("privacy").textContent = T.privacy;
+  $("desc").textContent = es ? "Carreras de bici con tres botones: ataca en las subidas, salta charcos y gana al sprint."
+                             : "Bike racing with three buttons: attack the climbs, jump the puddles and win the sprint.";
+
+  // los datos del reto, después del # (o después del ?, por si acaso)
+  var raw = (location.hash || "").replace(/^#/, "") || (location.search || "").replace(/^\?/, "");
+  var q = {};
+  raw.split("&").forEach(function (kv) {
+    var i = kv.indexOf("=");
+    if (i <= 0) return;
+    try { q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, " ")); } catch (e) { }
+  });
+  var level = parseInt(q.l, 10), tenths = parseInt(q.t, 10);
+  var ok = (!q.v || q.v === "1") && TRACKS.hasOwnProperty(q.p) && /^[1-9]\d{0,9}$/.test(q.s || "")
+    && level >= 1 && level <= 10 && /^\d+$/.test(q.l || "") && tenths >= 100 && tenths <= 36000 && /^\d+$/.test(q.t || "");
+  if (!ok) { $("title").textContent = T.titleNone; return; }
+
+  var name = (q.n || "").replace(/[‘’`´]/g, "'").replace(/[^A-Za-z0-9À-ÖØ-öø-þ '.\-]/g, "").replace(/ +/g, " ").slice(0, 12).trim();
+  var country = /^[a-z]{2}$/i.test(q.c || "") ? q.c.toLowerCase() : "";
+  function flag(c) { return c ? String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 97, 0x1F1E6 + c.charCodeAt(1) - 97) + " " : ""; }
+  function time(ds) { var m = Math.floor(ds / 600), s = Math.floor((ds % 600) / 10); return m + ":" + (s < 10 ? "0" : "") + s + (es ? "," : ".") + (ds % 10); }
+
+  $("title").textContent = T.title;
+  $("who").textContent = name ? flag(country) + name + T.challenges : T.someone;
+  $("who").hidden = false;
+  $("desc").textContent = T.desc;
+  $("timeLabel").textContent = T.label;
+  $("time").textContent = time(tenths);
+  $("track").textContent = TRACKS[q.p][es ? 0 : 1];
+  $("box").hidden = false;
+
+  var query = "v=1&p=" + q.p + "&s=" + q.s + "&l=" + level + "&t=" + tenths + (name ? "&n=" + encodeURIComponent(name) : "") + (country ? "&c=" + country : "");
+  var android = /android/i.test(navigator.userAgent);
+  // Android: si el juego no está instalado, Chrome lleva a Google Play solo
+  var open = android
+    ? "intent://reto?" + query + "#Intent;scheme=pedalazo;package=" + PACKAGE + ";S.browser_fallback_url=" + encodeURIComponent(PLAY) + ";end"
+    : "pedalazo://reto?" + query;
+  $("open").href = open;
+  $("open").textContent = T.open;
+  $("open").hidden = false;
+  $("have").textContent = T.have;
+  $("have").hidden = false;
+  document.title = "Pedalazo · " + T.title;
+})();
+</script>
+</body>
+</html>

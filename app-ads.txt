@@ -1,0 +1,4 @@
+# app-ads.txt de Pedalazo.
+# Pega aquí las líneas que te da AppLovin (panel de AppLovin > Account > General > App-ads.txt Info).
+# Las líneas que empiezan con # son comentarios: puedes dejarlas o borrarlas.
+# El archivo tiene que quedar en la raíz del sitio: https://pedalazo.github.io/app-ads.txt
